@@ -45,17 +45,21 @@ export const getDecimals = createEffect(
     rateLimit: false,
   },
   async ({ input }) => {
-    const rpcUrl = RPC_URLS[input.chainId];
-    const client = createPublicClient({
-      transport: http(rpcUrl),
-    });
+    try {
+      const rpcUrl = RPC_URLS[input.chainId];
+      const client = createPublicClient({
+        transport: http(rpcUrl),
+      });
 
-    const decimals = await client.readContract({
-      address: input.address as `0x${string}`,
-      abi: ERC20_ABI,
-      functionName: "decimals",
-    });
+      const decimals = await client.readContract({
+        address: input.address as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: "decimals",
+      });
 
-    return Number(decimals);
+      return Number(decimals);
+    } catch {
+      return 18;
+    }
   },
 );
