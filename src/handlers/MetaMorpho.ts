@@ -1,4 +1,4 @@
-import { MetaMorphoFactory, MetaMorpho } from "generated";
+import { indexer, MetaMorphoFactory, MetaMorpho } from "envio";
 import { getDecimals } from "../effects/getDecimals.js";
 import {
   ZERO_ADDRESS,
@@ -13,15 +13,20 @@ import {
                         CONTRACT REGISTER
 //////////////////////////////////////////////////////////////*/
 
-MetaMorphoFactory.CreateMetaMorpho.contractRegister(({ event, context }) => {
-  context.addMetaMorpho(event.params.metaMorpho);
-});
+indexer.contractRegister(
+  { contract: "MetaMorphoFactory", event: "CreateMetaMorpho" },
+  async ({ event, context }) => {
+  context.chain.MetaMorpho.add(event.params.metaMorpho);
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                         CREATE VAULT
 //////////////////////////////////////////////////////////////*/
 
-MetaMorphoFactory.CreateMetaMorpho.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorphoFactory", event: "CreateMetaMorpho" },
+  async ({ event, context }) => {
   const decimalsUnderlying = await context.effect(getDecimals, {
     address: event.params.asset,
     chainId: event.chainId,
@@ -58,13 +63,16 @@ MetaMorphoFactory.CreateMetaMorpho.handler(async ({ event, context }) => {
     name: event.params.name,
     symbol: event.params.symbol,
   });
-});
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                             OWNERSHIP
 //////////////////////////////////////////////////////////////*/
 
-MetaMorpho.OwnershipTransferStarted.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "OwnershipTransferStarted" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -73,9 +81,12 @@ MetaMorpho.OwnershipTransferStarted.handler(async ({ event, context }) => {
     ...existing,
     pendingOwner: event.params.newOwner,
   });
-});
+}
+);
 
-MetaMorpho.OwnershipTransferred.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "OwnershipTransferred" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -85,13 +96,16 @@ MetaMorpho.OwnershipTransferred.handler(async ({ event, context }) => {
     owner: event.params.newOwner,
     pendingOwner: ZERO_ADDRESS,
   });
-});
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                               SUBMIT
 //////////////////////////////////////////////////////////////*/
 
-MetaMorpho.SubmitCap.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SubmitCap" },
+  async ({ event, context }) => {
   const vId = vaultId(event.chainId, event.srcAddress);
   const v = await context.Vault.get(vId);
   const timelock = v?.timelock ?? 0n;
@@ -117,9 +131,12 @@ MetaMorpho.SubmitCap.handler(async ({ event, context }) => {
     pendingCap: event.params.cap,
     pendingCapValidAt: BigInt(event.block.timestamp) + timelock,
   });
-});
+}
+);
 
-MetaMorpho.SubmitGuardian.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SubmitGuardian" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -131,9 +148,12 @@ MetaMorpho.SubmitGuardian.handler(async ({ event, context }) => {
     pendingGuardian: event.params.newGuardian,
     pendingGuardianValidAt: BigInt(event.block.timestamp) + timelock,
   });
-});
+}
+);
 
-MetaMorpho.SubmitMarketRemoval.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SubmitMarketRemoval" },
+  async ({ event, context }) => {
   const vId = vaultId(event.chainId, event.srcAddress);
   const v = await context.Vault.get(vId);
   const timelock = v?.timelock ?? 0n;
@@ -150,9 +170,12 @@ MetaMorpho.SubmitMarketRemoval.handler(async ({ event, context }) => {
     ...existing,
     removableAt: BigInt(event.block.timestamp) + timelock,
   });
-});
+}
+);
 
-MetaMorpho.SubmitTimelock.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SubmitTimelock" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -164,13 +187,16 @@ MetaMorpho.SubmitTimelock.handler(async ({ event, context }) => {
     pendingTimelock: event.params.newTimelock,
     pendingTimelockValidAt: BigInt(event.block.timestamp) + timelock,
   });
-});
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                               REVOKE
 //////////////////////////////////////////////////////////////*/
 
-MetaMorpho.RevokePendingCap.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "RevokePendingCap" },
+  async ({ event, context }) => {
   const vId = vaultId(event.chainId, event.srcAddress);
   const configId = vaultConfigItemId(
     event.chainId,
@@ -193,9 +219,12 @@ MetaMorpho.RevokePendingCap.handler(async ({ event, context }) => {
     pendingCap: 0n,
     pendingCapValidAt: 0n,
   });
-});
+}
+);
 
-MetaMorpho.RevokePendingGuardian.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "RevokePendingGuardian" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -205,9 +234,12 @@ MetaMorpho.RevokePendingGuardian.handler(async ({ event, context }) => {
     pendingGuardian: ZERO_ADDRESS,
     pendingGuardianValidAt: 0n,
   });
-});
+}
+);
 
-MetaMorpho.RevokePendingMarketRemoval.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "RevokePendingMarketRemoval" },
+  async ({ event, context }) => {
   const vId = vaultId(event.chainId, event.srcAddress);
   const configId = vaultConfigItemId(
     event.chainId,
@@ -229,9 +261,12 @@ MetaMorpho.RevokePendingMarketRemoval.handler(async ({ event, context }) => {
     ...config,
     removableAt: 0n,
   });
-});
+}
+);
 
-MetaMorpho.RevokePendingTimelock.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "RevokePendingTimelock" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -241,13 +276,16 @@ MetaMorpho.RevokePendingTimelock.handler(async ({ event, context }) => {
     pendingTimelock: 0n,
     pendingTimelockValidAt: 0n,
   });
-});
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                               SET
 //////////////////////////////////////////////////////////////*/
 
-MetaMorpho.SetCap.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetCap" },
+  async ({ event, context }) => {
   const configId = vaultConfigItemId(
     event.chainId,
     event.srcAddress,
@@ -263,9 +301,12 @@ MetaMorpho.SetCap.handler(async ({ event, context }) => {
     pendingCapValidAt: 0n,
     ...(event.params.cap > 0n ? { enabled: true, removableAt: 0n } : {}),
   });
-});
+}
+);
 
-MetaMorpho.SetCurator.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetCurator" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -274,9 +315,12 @@ MetaMorpho.SetCurator.handler(async ({ event, context }) => {
     ...existing,
     curator: event.params.newCurator,
   });
-});
+}
+);
 
-MetaMorpho.SetVaultFee.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetVaultFee" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -285,9 +329,12 @@ MetaMorpho.SetVaultFee.handler(async ({ event, context }) => {
     ...existing,
     fee: event.params.newFee,
   });
-});
+}
+);
 
-MetaMorpho.SetFeeRecipient.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetFeeRecipient" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -296,9 +343,12 @@ MetaMorpho.SetFeeRecipient.handler(async ({ event, context }) => {
     ...existing,
     feeRecipient: event.params.newFeeRecipient,
   });
-});
+}
+);
 
-MetaMorpho.SetGuardian.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetGuardian" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -309,9 +359,12 @@ MetaMorpho.SetGuardian.handler(async ({ event, context }) => {
     pendingGuardian: ZERO_ADDRESS,
     pendingGuardianValidAt: 0n,
   });
-});
+}
+);
 
-MetaMorpho.SetIsAllocator.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetIsAllocator" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -328,9 +381,12 @@ MetaMorpho.SetIsAllocator.handler(async ({ event, context }) => {
     ...existing,
     allocators: [...set],
   });
-});
+}
+);
 
-MetaMorpho.SetName.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetName" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -339,9 +395,12 @@ MetaMorpho.SetName.handler(async ({ event, context }) => {
     ...existing,
     name: event.params.name,
   });
-});
+}
+);
 
-MetaMorpho.SetSkimRecipient.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetSkimRecipient" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -350,9 +409,12 @@ MetaMorpho.SetSkimRecipient.handler(async ({ event, context }) => {
     ...existing,
     skimRecipient: event.params.newSkimRecipient,
   });
-});
+}
+);
 
-MetaMorpho.SetSymbol.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetSymbol" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -361,9 +423,12 @@ MetaMorpho.SetSymbol.handler(async ({ event, context }) => {
     ...existing,
     symbol: event.params.symbol,
   });
-});
+}
+);
 
-MetaMorpho.SetTimelock.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetTimelock" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -374,13 +439,16 @@ MetaMorpho.SetTimelock.handler(async ({ event, context }) => {
     pendingTimelock: 0n,
     pendingTimelockValidAt: 0n,
   });
-});
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                               QUEUES
 //////////////////////////////////////////////////////////////*/
 
-MetaMorpho.SetSupplyQueue.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetSupplyQueue" },
+  async ({ event, context }) => {
   const vId = vaultId(event.chainId, event.srcAddress);
   const v = await context.Vault.get(vId);
   if (!v) return;
@@ -416,9 +484,12 @@ MetaMorpho.SetSupplyQueue.handler(async ({ event, context }) => {
         : undefined,
     });
   }
-});
+}
+);
 
-MetaMorpho.SetWithdrawQueue.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "SetWithdrawQueue" },
+  async ({ event, context }) => {
   const vId = vaultId(event.chainId, event.srcAddress);
   const v = await context.Vault.get(vId);
   if (!v) return;
@@ -454,13 +525,16 @@ MetaMorpho.SetWithdrawQueue.handler(async ({ event, context }) => {
         : undefined,
     });
   }
-});
+}
+);
 
 /*//////////////////////////////////////////////////////////////
                           SHARES/ASSETS
 //////////////////////////////////////////////////////////////*/
 
-MetaMorpho.Transfer.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "Transfer" },
+  async ({ event, context }) => {
   if (event.params.value === 0n) return;
 
   const vId = vaultId(event.chainId, event.srcAddress);
@@ -516,9 +590,12 @@ MetaMorpho.Transfer.handler(async ({ event, context }) => {
       shares: toBalance.shares + event.params.value,
     });
   }
-});
+}
+);
 
-MetaMorpho.UpdateLastTotalAssets.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "UpdateLastTotalAssets" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -527,9 +604,12 @@ MetaMorpho.UpdateLastTotalAssets.handler(async ({ event, context }) => {
     ...existing,
     lastTotalAssets: event.params.updatedTotalAssets,
   });
-});
+}
+);
 
-MetaMorpho.UpdateLostAssets.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "MetaMorpho", event: "UpdateLostAssets" },
+  async ({ event, context }) => {
   const id = vaultId(event.chainId, event.srcAddress);
   const existing = await context.Vault.get(id);
   if (!existing) return;
@@ -538,4 +618,5 @@ MetaMorpho.UpdateLostAssets.handler(async ({ event, context }) => {
     ...existing,
     lostAssets: event.params.newLostAssets,
   });
-});
+}
+);

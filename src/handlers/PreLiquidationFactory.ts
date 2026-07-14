@@ -1,7 +1,8 @@
-import { PreLiquidationFactory } from "generated";
+import { indexer, PreLiquidationFactory } from "envio";
 import { preLiquidationContractId, marketId } from "../utils/ids.js";
 
-PreLiquidationFactory.CreatePreLiquidation.handler(
+indexer.onEvent(
+  { contract: "PreLiquidationFactory", event: "CreatePreLiquidation" },
   async ({ event, context }) => {
     const id = preLiquidationContractId(
       event.chainId,
@@ -21,5 +22,5 @@ PreLiquidationFactory.CreatePreLiquidation.handler(
       preLIF2: event.params.preLiquidationParams[4],
       preLiquidationOracle: event.params.preLiquidationParams[5],
     });
-  },
+  }
 );

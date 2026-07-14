@@ -1,7 +1,9 @@
-import { AdaptiveCurveIRM } from "generated";
+import { indexer, AdaptiveCurveIRM } from "envio";
 import { marketId } from "../utils/ids.js";
 
-AdaptiveCurveIRM.BorrowRateUpdate.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "AdaptiveCurveIRM", event: "BorrowRateUpdate" },
+  async ({ event, context }) => {
   const id = marketId(event.chainId, event.params.id);
   const existing = await context.Market.get(id);
   if (!existing) return;
@@ -10,4 +12,5 @@ AdaptiveCurveIRM.BorrowRateUpdate.handler(async ({ event, context }) => {
     ...existing,
     rateAtTarget: event.params.rateAtTarget,
   });
-});
+}
+);

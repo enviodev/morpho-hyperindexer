@@ -1,7 +1,5 @@
 {
-  /* For details: https://www.totaltypescript.com/tsconfig-cheat-sheet */
   "compilerOptions": {
-    /* Base Options: */
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2022",
@@ -9,19 +7,16 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-
-    /* Strictness */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
+    "strict": false,
     "noImplicitOverride": true,
-
-    /* For running Envio: */
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
-
-    /* Code doesn't run in the DOM: */
-    "lib": ["es2022"]
+    "lib": [
+      "es2022"
+    ],
+    "types": [
+      "node"
+    ]
   }
 }

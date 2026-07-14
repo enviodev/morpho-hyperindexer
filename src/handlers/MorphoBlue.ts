@@ -1,11 +1,13 @@
-import { Morpho } from "generated";
+import { indexer, Morpho } from "envio";
 import {
   marketId,
   positionId,
   authorizationId,
 } from "../utils/ids.js";
 
-Morpho.CreateMarket.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "CreateMarket" },
+  async ({ event, context }) => {
   const id = marketId(event.chainId, event.params.id);
 
   context.Market.set({
@@ -26,9 +28,12 @@ Morpho.CreateMarket.handler(async ({ event, context }) => {
     rateAtTarget: 0n,
   });
 
-});
+}
+);
 
-Morpho.SetFee.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "SetFee" },
+  async ({ event, context }) => {
   const id = marketId(event.chainId, event.params.id);
   const existing = await context.Market.getOrThrow(id);
 
@@ -37,9 +42,12 @@ Morpho.SetFee.handler(async ({ event, context }) => {
     fee: event.params.newFee,
     lastUpdate: BigInt(event.block.timestamp),
   });
-});
+}
+);
 
-Morpho.AccrueInterest.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "AccrueInterest" },
+  async ({ event, context }) => {
   const id = marketId(event.chainId, event.params.id);
   const existing = await context.Market.getOrThrow(id);
 
@@ -50,9 +58,12 @@ Morpho.AccrueInterest.handler(async ({ event, context }) => {
     totalBorrowAssets: existing.totalBorrowAssets + event.params.interest,
     lastUpdate: BigInt(event.block.timestamp),
   });
-});
+}
+);
 
-Morpho.Supply.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "Supply" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -76,9 +87,12 @@ Morpho.Supply.handler(async ({ event, context }) => {
     ...position,
     supplyShares: position.supplyShares + event.params.shares,
   });
-});
+}
+);
 
-Morpho.Withdraw.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "Withdraw" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -102,9 +116,12 @@ Morpho.Withdraw.handler(async ({ event, context }) => {
     ...position,
     supplyShares: position.supplyShares - event.params.shares,
   });
-});
+}
+);
 
-Morpho.SupplyCollateral.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "SupplyCollateral" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -126,9 +143,12 @@ Morpho.SupplyCollateral.handler(async ({ event, context }) => {
     ...position,
     collateral: position.collateral + event.params.assets,
   });
-});
+}
+);
 
-Morpho.WithdrawCollateral.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "WithdrawCollateral" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -150,9 +170,12 @@ Morpho.WithdrawCollateral.handler(async ({ event, context }) => {
     ...position,
     collateral: position.collateral - event.params.assets,
   });
-});
+}
+);
 
-Morpho.Borrow.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "Borrow" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -176,9 +199,12 @@ Morpho.Borrow.handler(async ({ event, context }) => {
     ...position,
     borrowShares: position.borrowShares + event.params.shares,
   });
-});
+}
+);
 
-Morpho.Repay.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "Repay" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -202,9 +228,12 @@ Morpho.Repay.handler(async ({ event, context }) => {
     ...position,
     borrowShares: position.borrowShares - event.params.shares,
   });
-});
+}
+);
 
-Morpho.Liquidate.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "Liquidate" },
+  async ({ event, context }) => {
   const mId = marketId(event.chainId, event.params.id);
   const market = await context.Market.getOrThrow(mId);
   context.Market.set({
@@ -234,9 +263,12 @@ Morpho.Liquidate.handler(async ({ event, context }) => {
       event.params.repaidShares -
       event.params.badDebtShares,
   });
-});
+}
+);
 
-Morpho.SetAuthorization.handler(async ({ event, context }) => {
+indexer.onEvent(
+  { contract: "Morpho", event: "SetAuthorization" },
+  async ({ event, context }) => {
   const id = authorizationId(
     event.chainId,
     event.params.authorizer,
@@ -250,4 +282,5 @@ Morpho.SetAuthorization.handler(async ({ event, context }) => {
     authorizee: event.params.authorized,
     isAuthorized: event.params.newIsAuthorized,
   });
-});
+}
+);
