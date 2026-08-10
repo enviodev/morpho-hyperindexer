@@ -12,7 +12,6 @@ indexer.onEvent(
 
     context.PreLiquidationContract.set({
       id,
-      chainId: event.chainId,
       market_id: marketId(event.chainId, event.params.id),
       address: event.params.preLiquidation,
       preLltv: event.params.preLiquidationParams[0],

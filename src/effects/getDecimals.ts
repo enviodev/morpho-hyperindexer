@@ -38,7 +38,6 @@ export const getDecimals = createEffect(
     name: "getDecimals",
     input: S.schema({
       address: S.string,
-      chainId: S.number,
     }),
     output: S.number,
     cache: true,

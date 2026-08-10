@@ -29,7 +29,6 @@ indexer.onEvent(
   async ({ event, context }) => {
   const decimalsUnderlying = await context.effect(getDecimals, {
     address: event.params.asset,
-    chainId: event.chainId,
   });
   const decimalsOffset = Math.max(0, 18 - decimalsUnderlying);
 
@@ -37,7 +36,6 @@ indexer.onEvent(
 
   context.Vault.set({
     id,
-    chainId: event.chainId,
     address: event.params.metaMorpho,
     asset: event.params.asset,
     decimalsUnderlying,
@@ -117,7 +115,6 @@ indexer.onEvent(
   );
   const config = await context.VaultConfigItem.getOrCreate({
     id: configId,
-    chainId: event.chainId,
     vault_id: vId,
     market_id: marketId(event.chainId, event.params.id),
     cap: 0n,
@@ -205,7 +202,6 @@ indexer.onEvent(
   );
   const config = await context.VaultConfigItem.getOrCreate({
     id: configId,
-    chainId: event.chainId,
     vault_id: vId,
     market_id: marketId(event.chainId, event.params.id),
     cap: 0n,
@@ -248,7 +244,6 @@ indexer.onEvent(
   );
   const config = await context.VaultConfigItem.getOrCreate({
     id: configId,
-    chainId: event.chainId,
     vault_id: vId,
     market_id: marketId(event.chainId, event.params.id),
     cap: 0n,
@@ -472,7 +467,6 @@ indexer.onEvent(
 
     const queueItem = await context.VaultSupplyQueueItem.getOrCreate({
       id: queueItemId,
-      chainId: event.chainId,
       vault_id: vId,
       ordinal,
       market_id: undefined,
@@ -513,7 +507,6 @@ indexer.onEvent(
 
     const queueItem = await context.VaultWithdrawQueueItem.getOrCreate({
       id: queueItemId,
-      chainId: event.chainId,
       vault_id: vId,
       ordinal,
       market_id: undefined,
@@ -580,7 +573,6 @@ indexer.onEvent(
     );
     const toBalance = await context.VaultBalance.getOrCreate({
       id: toBalanceId,
-      chainId: event.chainId,
       vault_id: vId,
       user: event.params.to,
       shares: 0n,

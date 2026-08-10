@@ -12,7 +12,6 @@ indexer.onEvent(
 
   context.Market.set({
     id,
-    chainId: event.chainId,
     marketId: event.params.id,
     loanToken: event.params.marketParams[0],
     collateralToken: event.params.marketParams[1],
@@ -76,7 +75,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.onBehalf);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.onBehalf,
     supplyShares: 0n,
@@ -105,7 +103,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.onBehalf);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.onBehalf,
     supplyShares: 0n,
@@ -132,7 +129,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.onBehalf);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.onBehalf,
     supplyShares: 0n,
@@ -159,7 +155,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.onBehalf);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.onBehalf,
     supplyShares: 0n,
@@ -188,7 +183,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.onBehalf);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.onBehalf,
     supplyShares: 0n,
@@ -217,7 +211,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.onBehalf);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.onBehalf,
     supplyShares: 0n,
@@ -248,7 +241,6 @@ indexer.onEvent(
   const pId = positionId(event.chainId, event.params.id, event.params.borrower);
   const position = await context.Position.getOrCreate({
     id: pId,
-    chainId: event.chainId,
     market_id: mId,
     user: event.params.borrower,
     supplyShares: 0n,
@@ -277,7 +269,6 @@ indexer.onEvent(
 
   context.Authorization.set({
     id,
-    chainId: event.chainId,
     authorizer: event.params.authorizer,
     authorizee: event.params.authorized,
     isAuthorized: event.params.newIsAuthorized,
